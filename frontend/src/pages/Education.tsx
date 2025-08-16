@@ -3,8 +3,7 @@ import FAQ from '../components/FAQ'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import axios from 'axios'
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:4000'
+import { API_URL } from '../utils/api'
 
 export default function Education() {
   const [articles, setArticles] = useState<any[]>([])
@@ -16,7 +15,7 @@ export default function Education() {
 
   const fetchArticles = async () => {
     try {
-      const response = await axios.get(`${API}/api/articles`)
+      const response = await axios.get(API_URL('articles'))
       setArticles(response.data.slice(0, 3)) // Show only first 3 articles
     } catch (error) {
       console.error('Error fetching articles:', error)

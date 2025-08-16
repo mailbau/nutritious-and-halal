@@ -4,13 +4,12 @@ import SearchBar from '../components/SearchBar'
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:4000'
+import { API_URL } from '../utils/api'
 
 export default function Home() {
   const [articles, setArticles] = useState<any[]>([])
   useEffect(() => {
-    axios.get(`${API}/api/articles`).then(r => setArticles(r.data))
+    axios.get(API_URL('articles')).then(r => setArticles(r.data))
   }, [])
 
   return (

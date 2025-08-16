@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+import { API_URL } from '../utils/api';
 
 export default function AdminLogin() {
-    const [credentials, setCredentials] = useState({ username: '', password: '' });
+    const [credentials, setCredentials] = useState({
+        username: '',
+        password: ''
+    });
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const navigate = useNavigate();
@@ -16,7 +18,7 @@ export default function AdminLogin() {
         setError('');
 
         try {
-            const response = await axios.post(`${API}/api/admin/login`, credentials);
+            const response = await axios.post(API_URL('admin/login'), credentials);
             localStorage.setItem('adminToken', response.data.token);
             localStorage.setItem('adminUser', JSON.stringify(response.data.admin));
             navigate('/admin/dashboard');

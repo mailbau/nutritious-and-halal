@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+import { API_URL } from '../utils/api';
 
 export default function ArticlesList() {
     const [articles, setArticles] = useState<any[]>([]);
@@ -18,7 +17,7 @@ export default function ArticlesList() {
         try {
             setLoading(true);
             const params = selectedCategory ? { category: selectedCategory } : {};
-            const response = await axios.get(`${API}/api/articles`, { params });
+            const response = await axios.get(API_URL('articles'), { params });
             setArticles(response.data);
         } catch (error: any) {
             setError(error.response?.data?.error || 'Failed to fetch articles');
@@ -72,8 +71,8 @@ export default function ArticlesList() {
                                 key={category.value}
                                 onClick={() => setSelectedCategory(category.value)}
                                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${selectedCategory === category.value
-                                        ? 'bg-green-600 text-white'
-                                        : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
+                                    ? 'bg-green-600 text-white'
+                                    : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'
                                     }`}
                             >
                                 {category.label}

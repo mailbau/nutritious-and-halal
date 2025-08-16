@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+import { API_URL } from '../utils/api';
 
 export default function ArticleDetail() {
     const { id } = useParams();
@@ -18,7 +17,7 @@ export default function ArticleDetail() {
     const fetchArticle = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${API}/api/articles/${id}`);
+            const response = await axios.get(API_URL(`articles/${id}`));
             setArticle(response.data);
         } catch (error: any) {
             setError(error.response?.data?.error || 'Failed to fetch article');

@@ -1,101 +1,82 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+import { API_URL } from '../utils/api';
 
 export default function ArticleForm() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(false);
-    const [saving, setSaving] = useState(false);
-    const [error, setError] = useState('');
     const [formData, setFormData] = useState({
         title: '',
         summary: '',
         content: '',
         category: '',
-        author: '',
-        image: null as File | null
+        author: ''
     });
+    const [image, setImage] = useState<File | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     useEffect(() => {
-        const token = localStorage.getItem('adminToken');
-        if (!token) {
-            navigate('/admin/login');
-            return;
-        }
-
         if (id) {
             fetchArticle();
         }
-    }, [id, navigate]);
+    }, [id]);
 
     const fetchArticle = async () => {
         try {
-            setLoading(true);
-            const token = localStorage.getItem('adminToken');
-            const response = await axios.get(`${API}/api/articles/${id}`, {
-                headers: { Authorization: `Bearer ${token}` }
+            const response = await axios.get(API_URL(`articles/${id}`), {
+                headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` }
             });
-
             const article = response.data;
             setFormData({
-                title: article.title || '',
-                summary: article.summary || '',
-                content: article.content || '',
+                title: article.title,
+                summary: article.summary,
+                content: article.content,
                 category: article.category || '',
-                author: article.author || '',
-                image: null
+                author: article.author || ''
             });
         } catch (error: any) {
-            setError(error.response?.data?.error || 'Failed to fetch article');
-        } finally {
-            setLoading(false);
+            setError('Failed to fetch article');
         }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setSaving(true);
+        setLoading(true);
         setError('');
 
         try {
             const token = localStorage.getItem('adminToken');
-            const formDataToSend = new FormData();
+            const headers = { Authorization: `Bearer ${token}` };
 
+            const formDataToSend = new FormData();
             formDataToSend.append('title', formData.title);
             formDataToSend.append('summary', formData.summary);
             formDataToSend.append('content', formData.content);
             formDataToSend.append('category', formData.category);
             formDataToSend.append('author', formData.author);
-
-            if (formData.image) {
-                formDataToSend.append('image', formData.image);
+            if (image) {
+                formDataToSend.append('image', image);
             }
 
-            const headers = {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'multipart/form-data'
-            };
-
             if (id) {
-                await axios.put(`${API}/api/articles/${id}`, formDataToSend, { headers });
+                await axios.put(API_URL(`articles/${id}`), formDataToSend, { headers });
             } else {
-                await axios.post(`${API}/api/articles`, formDataToSend, { headers });
+                await axios.post(API_URL('articles'), formDataToSend, { headers });
             }
 
             navigate('/admin/dashboard');
         } catch (error: any) {
             setError(error.response?.data?.error || 'Failed to save article');
         } finally {
-            setSaving(false);
+            setLoading(false);
         }
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            setFormData({ ...formData, image: e.target.files[0] });
+            setImage(e.target.files[0]);
         }
     };
 
@@ -239,10 +220,10 @@ export default function ArticleForm() {
                             </button>
                             <button
                                 type="submit"
-                                disabled={saving}
+                                disabled={loading}
                                 className="px-6 py-3 bg-green-600 text-white rounded-xl hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {saving ? (
+                                {loading ? (
                                     <div className="flex items-center">
                                         <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

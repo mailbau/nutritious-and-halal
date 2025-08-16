@@ -1,24 +1,25 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+import { API_URL } from '../utils/api';
 
 export default function AdminDashboard() {
-    const [stats, setStats] = useState({ articles: 0, foods: 0, faqs: 0 });
-    const [recentArticles, setRecentArticles] = useState([]);
+    const [stats, setStats] = useState<any>(null);
+    const [recentArticles, setRecentArticles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
+        checkAuth();
+        fetchDashboardData();
+    }, []);
+
+    const checkAuth = () => {
         const token = localStorage.getItem('adminToken');
         if (!token) {
             navigate('/admin/login');
-            return;
         }
-
-        fetchDashboardData();
-    }, [navigate]);
+    };
 
     const fetchDashboardData = async () => {
         try {
@@ -26,8 +27,8 @@ export default function AdminDashboard() {
             const headers = { Authorization: `Bearer ${token}` };
 
             const [statsResponse, articlesResponse] = await Promise.all([
-                axios.get(`${API}/api/admin/stats`, { headers }),
-                axios.get(`${API}/api/admin/recent-articles`, { headers })
+                axios.get(API_URL('admin/stats'), { headers }),
+                axios.get(API_URL('admin/recent-articles'), { headers })
             ]);
 
             setStats(statsResponse.data);
@@ -99,7 +100,7 @@ export default function AdminDashboard() {
                             <div className="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt className="text-sm font-medium text-gray-500 truncate">Total Articles</dt>
-                                    <dd className="text-lg font-medium text-gray-900">{stats.articles}</dd>
+                                    <dd className="text-lg font-medium text-gray-900">{stats?.articles}</dd>
                                 </dl>
                             </div>
                         </div>
@@ -117,7 +118,7 @@ export default function AdminDashboard() {
                             <div className="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt className="text-sm font-medium text-gray-500 truncate">Total Foods</dt>
-                                    <dd className="text-lg font-medium text-gray-900">{stats.foods}</dd>
+                                    <dd className="text-lg font-medium text-gray-900">{stats?.foods}</dd>
                                 </dl>
                             </div>
                         </div>
@@ -135,7 +136,7 @@ export default function AdminDashboard() {
                             <div className="ml-5 w-0 flex-1">
                                 <dl>
                                     <dt className="text-sm font-medium text-gray-500 truncate">Total FAQs</dt>
-                                    <dd className="text-lg font-medium text-gray-900">{stats.faqs}</dd>
+                                    <dd className="text-lg font-medium text-gray-900">{stats?.faqs}</dd>
                                 </dl>
                             </div>
                         </div>
