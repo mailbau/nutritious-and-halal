@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "name": "Kopi Susu Botol",
+    "brand": "SeduhMurni",
+    "category": "Minuman",
+    "halal": true,
+    "barcode": "8991234567890",
+    "image": "/images/coffee.jpg",
+    "reason": "Bahan baku nabati, emulsifier bersertifikat."
+  },
+  {
+    "id": 2,
+    "name": "Sosis Ayam Beku",
+    "brand": "DeliFresh",
+    "category": "Daging Olahan",
+    "halal": true,
+    "barcode": "8990001112223",
+    "image": "/images/sausage.jpg",
+    "reason": "Bahan baku dan proses bersertifikat halal."
+  },
+  {
+    "id": 3,
+    "name": "Gelatin Snack",
+    "brand": "Gelli",
+    "category": "Camilan",
+    "halal": false,
+    "barcode": "8990003334445",
+    "image": "/images/gelatin.jpg",
+    "reason": "Mengandung gelatin tidak jelas sumbernya."
+  },
+  {
+    "id": 4,
+    "name": "Burger Keju Siap Saji",
+    "brand": "QuickBite",
+    "category": "Siap Saji",
+    "halal": true,
+    "barcode": "8990098765432",
+    "image": "/images/burger.jpg",
+    "reason": "Daging dari pemasok bersertifikat, keju halal."
+  }
+]

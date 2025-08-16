@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "title": "Sertifikat Halal di Era Modern",
+    "summary": "Gambaran proses sertifikasi dan pengawasan produk.",
+    "image": "/images/article1.jpg"
+  },
+  {
+    "id": 2,
+    "title": "Memahami Bahan Baku",
+    "summary": "Mengenal istilah umum pada label produk pangan halal.",
+    "image": "/images/article2.jpg"
+  },
+  {
+    "id": 3,
+    "title": "Publikasi & Metodologi",
+    "summary": "Dampak sertifikasi halal terhadap kepercayaan konsumen.",
+    "image": "/images/article3.jpg"
+  }
+]
