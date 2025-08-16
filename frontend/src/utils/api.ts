@@ -6,6 +6,14 @@ const cleanBase = API_BASE.replace(/\/$/, '')
 // Check if the base URL already includes /api
 const hasApiPath = cleanBase.includes('/api')
 
+// Debug logging
+console.log('API Configuration:', {
+    VITE_API_URL: import.meta.env.VITE_API_URL,
+    API_BASE,
+    cleanBase,
+    hasApiPath
+})
+
 export const API_URL = (endpoint: string) => {
     // Remove leading slash from endpoint
     const cleanEndpoint = endpoint.replace(/^\//, '')

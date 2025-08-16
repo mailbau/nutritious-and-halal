@@ -18,9 +18,25 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 4000;
 
-app.use(cors());
+// CORS configuration for production
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production'
+    ? ['https://nutritious-and-halal.vercel.app', 'http://localhost:3000']
+    : true,
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(morgan("dev"));
+
+// Root route for debugging
+app.get("/", (req, res) => {
+  res.json({
+    message: "NAY Halal Guide API",
+    status: "running",
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Health check
 app.get("/api/health", (req, res) => {
@@ -140,6 +156,6 @@ app.use((error, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(PORT, () => {
-  console.log(`API listening on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`API listening on port ${PORT}`);
 });
