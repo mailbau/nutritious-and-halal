@@ -40,8 +40,8 @@ export default async function HomePage() {
                         <div className="relative">
                             <div className="relative rounded-3xl overflow-hidden shadow-large">
                                 <Image
-                                    src="/images/burger.jpg"
-                                    alt="Burger Halal"
+                                    src="/assets/makananhalal.jpg"
+                                    alt="Makanan Halal"
                                     width={600}
                                     height={500}
                                     className="w-full h-auto object-cover"

@@ -101,7 +101,7 @@ export default function AdminArticlesPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center gap-3">
-                            <img src="/nay.png" className="h-8 w-8 rounded-lg" alt="NAY" />
+                            <img src="/assets/logonay.png" className="h-8 w-8 rounded-lg" alt="NAY" />
                             <span className="font-bold text-xl text-gray-900">Kelola Artikel</span>
                         </div>
                         <div className="flex items-center gap-4">

@@ -47,7 +47,7 @@ export default function AdminLoginPage() {
             <div className="max-w-md w-full space-y-8">
                 <div className="text-center">
                     <div className="flex justify-center">
-                        <img src="/nay.png" className="h-16 w-16 rounded-xl" alt="NAY" />
+                        <img src="/assets/logonay.png" className="h-16 w-16 rounded-xl" alt="NAY" />
                     </div>
                     <h2 className="mt-6 text-3xl font-bold text-gray-900">
                         Admin Login

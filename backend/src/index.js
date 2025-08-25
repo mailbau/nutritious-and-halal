@@ -133,7 +133,7 @@ app.get("/api/check", async (req, res) => {
 // FAQs API (migrated to PostgreSQL)
 app.get("/api/faqs", async (req, res) => {
   try {
-    const result = await pool.query('SELECT question as q, answer as a FROM faqs ORDER BY created_at DESC');
+    const result = await pool.query('SELECT id, question, answer FROM faqs ORDER BY created_at DESC');
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching FAQs:', error);

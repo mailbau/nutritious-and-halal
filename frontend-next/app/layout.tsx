@@ -14,7 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex items-center justify-between h-16">
                             <Link href="/" className="flex items-center gap-3 group">
-                                <img src="/nay.png" className="h-10 w-10 rounded-xl shadow-sm group-hover:shadow-md transition-shadow duration-200" alt="NAY" />
+                                <img src="/assets/logonay.png" className="h-10 w-10 rounded-xl shadow-sm group-hover:shadow-md transition-shadow duration-200" alt="NAY" />
                                 <span className="font-bold text-xl text-gray-900 group-hover:text-green-600 transition-colors duration-200">NAY Halal Guide</span>
                             </Link>
                             <nav className="hidden md:flex items-center space-x-8">
@@ -40,7 +40,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3">
-                                    <img src="/nay.png" className="h-8 w-8 rounded-lg" alt="NAY" />
+                                    <img src="/assets/logonay.png" className="h-8 w-8 rounded-lg" alt="NAY" />
                                     <span className="font-bold text-lg text-gray-900">NAY Halal Guide</span>
                                 </div>
                                 <p className="text-gray-600 text-sm leading-relaxed">

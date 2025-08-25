@@ -28,6 +28,7 @@ export default function EditFoodPage() {
     })
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
+    const [uploading, setUploading] = useState(false)
     const [error, setError] = useState('')
     const router = useRouter()
     const params = useParams()
@@ -84,6 +85,27 @@ export default function EditFoodPage() {
             setError('Terjadi kesalahan saat memuat data makanan')
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleUpload = async (file: File) => {
+        setUploading(true)
+        try {
+            const token = localStorage.getItem('adminToken')
+            const fd = new FormData()
+            fd.append('file', file)
+            const res = await fetch(`${API_BASE}/api/admin/upload`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: fd
+            })
+            if (!res.ok) throw new Error('Gagal upload gambar')
+            const data = await res.json()
+            setFormData(prev => ({ ...prev, image: data.url }))
+        } catch (e) {
+            setError('Gagal mengunggah gambar. Coba file lain.')
+        } finally {
+            setUploading(false)
         }
     }
 
@@ -153,7 +175,7 @@ export default function EditFoodPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center gap-3">
-                            <img src="/nay.png" className="h-8 w-8 rounded-lg" alt="NAY" />
+                            <img src="/assets/logonay.png" className="h-8 w-8 rounded-lg" alt="NAY" />
                             <span className="font-bold text-xl text-gray-900">Edit Makanan</span>
                         </div>
                         <div className="flex items-center gap-4">
@@ -291,15 +313,33 @@ export default function EditFoodPage() {
                                     <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
                                         Gambar Makanan *
                                     </label>
-                                    <input
-                                        type="url"
-                                        id="image"
-                                        required
-                                        className="input-field"
-                                        placeholder="Masukkan URL gambar makanan"
-                                        value={formData.image}
-                                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                                    />
+                                    <div className="space-y-3">
+                                        {formData.image && (
+                                            <div className="w-24 h-24 rounded-lg overflow-hidden">
+                                                <img src={formData.image} alt="Preview" className="w-full h-full object-cover" />
+                                            </div>
+                                        )}
+                                        <input
+                                            type="file"
+                                            id="image"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0]
+                                                if (file) handleUpload(file)
+                                            }}
+                                            className="block text-sm text-gray-700"
+                                        />
+                                        {uploading && <p className="text-sm text-gray-500">Mengunggah gambar...</p>}
+                                        {formData.image && (
+                                            <input
+                                                type="url"
+                                                className="input-field"
+                                                value={formData.image}
+                                                onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+                                                placeholder="URL gambar"
+                                            />
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -311,7 +351,7 @@ export default function EditFoodPage() {
                             </Link>
                             <button
                                 type="submit"
-                                disabled={saving}
+                                disabled={saving || uploading || !formData.image}
                                 className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {saving ? 'Menyimpan...' : 'Simpan Perubahan'}

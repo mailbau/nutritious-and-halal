@@ -20,7 +20,18 @@ export default function AdminFoodsPage() {
     const [foods, setFoods] = useState<Food[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
+    const [categoryFilter, setCategoryFilter] = useState('')
     const router = useRouter()
+
+    const categories = [
+        { id: '', name: 'Semua Kategori' },
+        { id: 'karbohidrat', name: 'Karbohidrat' },
+        { id: 'protein-hewani', name: 'Protein Hewani' },
+        { id: 'protein-nabati', name: 'Protein Nabati' },
+        { id: 'lemak', name: 'Lemak' },
+        { id: 'vitamin-mineral', name: 'Vitamin & Mineral' },
+        { id: 'bahan-tambahan-pangan', name: 'Bahan Tambahan Pangan' }
+    ]
 
     useEffect(() => {
         const token = localStorage.getItem('adminToken')
@@ -53,6 +64,8 @@ export default function AdminFoodsPage() {
             setLoading(false)
         }
     }
+
+    const filteredFoods = foods.filter(f => !categoryFilter || f.category === categoryFilter)
 
     const handleDelete = async (id: number) => {
         if (!confirm('Apakah Anda yakin ingin menghapus makanan ini?')) return
@@ -100,7 +113,7 @@ export default function AdminFoodsPage() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center gap-3">
-                            <img src="/nay.png" className="h-8 w-8 rounded-lg" alt="NAY" />
+                            <img src="/assets/logonay.png" className="h-8 w-8 rounded-lg" alt="NAY" />
                             <span className="font-bold text-xl text-gray-900">Kelola Makanan</span>
                         </div>
                         <div className="flex items-center gap-4">
@@ -132,6 +145,24 @@ export default function AdminFoodsPage() {
                         <Link href="/admin/foods/new" className="btn-primary">
                             Tambah Makanan Baru
                         </Link>
+                    </div>
+
+                    {/* Filters */}
+                    <div className="card p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Filter Kategori</label>
+                                <select
+                                    className="input-field"
+                                    value={categoryFilter}
+                                    onChange={(e) => setCategoryFilter(e.target.value)}
+                                >
+                                    {categories.map(c => (
+                                        <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
                     </div>
 
                     {error && (
@@ -170,7 +201,7 @@ export default function AdminFoodsPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {foods.map((food) => (
+                                    {filteredFoods.map((food) => (
                                         <tr key={food.id} className="hover:bg-gray-50">
                                             <td className="px-6 py-4">
                                                 <div className="text-sm font-medium text-gray-900">
@@ -239,18 +270,15 @@ export default function AdminFoodsPage() {
                             </table>
                         </div>
 
-                        {foods.length === 0 && (
+                        {filteredFoods.length === 0 && (
                             <div className="text-center py-12">
                                 <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                     <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
                                     </svg>
                                 </div>
-                                <h3 className="text-lg font-medium text-gray-900 mb-2">Belum ada data makanan</h3>
-                                <p className="text-gray-500 mb-4">Mulai dengan menambahkan makanan pertama ke database</p>
-                                <Link href="/admin/foods/new" className="btn-primary">
-                                    Tambah Makanan Pertama
-                                </Link>
+                                <h3 className="text-lg font-medium text-gray-900 mb-2">Tidak ada makanan untuk filter ini</h3>
+                                <p className="text-gray-500 mb-4">Ubah filter kategori untuk melihat data lainnya</p>
                             </div>
                         )}
                     </div>

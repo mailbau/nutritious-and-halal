@@ -12,6 +12,8 @@ export default function IngredientsPage() {
     const [loadingFoods, setLoadingFoods] = useState(false)
     const [observations, setObservations] = useState<any[]>([])
     const [obsAnswers, setObsAnswers] = useState<Record<number, 'IYA' | 'TIDAK' | undefined>>({})
+    const [suggestions, setSuggestions] = useState<any[]>([])
+    const [showSuggestions, setShowSuggestions] = useState(false)
 
     useEffect(() => {
         async function fetchObservations() {
@@ -27,6 +29,30 @@ export default function IngredientsPage() {
         }
         fetchObservations()
     }, [])
+
+    useEffect(() => {
+        const term = q.trim()
+        if (term.length < 2) {
+            setSuggestions([])
+            return
+        }
+        const abort = new AbortController()
+        const timer = setTimeout(async () => {
+            try {
+                const res = await fetch(`${API_BASE}/api/foods?q=${encodeURIComponent(term)}`, { signal: abort.signal as any })
+                if (res.ok) {
+                    const data = await res.json()
+                    setSuggestions(data.slice(0, 8))
+                }
+            } catch {
+                // ignore abort/errors
+            }
+        }, 250)
+        return () => {
+            clearTimeout(timer)
+            abort.abort()
+        }
+    }, [q])
 
     const categories = [
         {
@@ -154,8 +180,8 @@ export default function IngredientsPage() {
                                     {selectedFood.name}
                                 </h1>
                                 <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${selectedFood.halal
-                                        ? 'bg-green-100 text-green-800'
-                                        : 'bg-red-100 text-red-800'
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-red-100 text-red-800'
                                     }`}>
                                     {selectedFood.halal ? 'HALAL' : 'TIDAK HALAL'}
                                 </span>
@@ -271,6 +297,8 @@ export default function IngredientsPage() {
                             value={q}
                             onChange={e => setQ(e.target.value)}
                             onKeyDown={e => e.key === 'Enter' && onCheck()}
+                            onFocus={() => setShowSuggestions(true)}
+                            onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
                         />
                         <button
                             onClick={onCheck}
@@ -280,6 +308,29 @@ export default function IngredientsPage() {
                             {loading ? 'Memeriksa...' : 'Periksa'}
                         </button>
                     </div>
+                    {showSuggestions && suggestions.length > 0 && (
+                        <div className="mt-2 bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+                            {suggestions.map((item) => (
+                                <button
+                                    key={item.id}
+                                    type="button"
+                                    className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3"
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => { setQ(item.name); onCheck(); setShowSuggestions(false); }}
+                                >
+                                    {item.image && (
+                                        <img src={item.image} alt={item.name} className="w-10 h-10 rounded object-cover" />
+                                    )}
+                                    <div>
+                                        <div className="text-sm font-medium text-gray-900">{item.name}</div>
+                                        {item.category && (
+                                            <div className="text-xs text-gray-500 capitalize">{item.category.replace(/-/g, ' ')}</div>
+                                        )}
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    )}
                     {result && (
                         <div className="border-t pt-4">
                             {!result.found ? (

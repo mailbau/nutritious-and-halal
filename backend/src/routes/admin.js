@@ -1,8 +1,22 @@
 import express from 'express';
 import { loginAdmin, authenticateAdmin } from '../middleware/auth.js';
 import pool from '../database/config.js';
+import multer from 'multer';
+import crypto from 'crypto';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 
 const router = express.Router();
+
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024 } });
+
+const r2 = new S3Client({
+    region: 'auto',
+    endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID || '',
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || ''
+    }
+});
 
 // Admin login
 router.post('/login', loginAdmin);
@@ -152,6 +166,27 @@ router.delete('/foods/:id', authenticateAdmin, async (req, res) => {
     } catch (error) {
         console.error('Error deleting food:', error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.post('/upload', authenticateAdmin, upload.single('file'), async (req, res) => {
+    try {
+        if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+        const ext = req.file.originalname.includes('.') ? req.file.originalname.split('.').pop() : 'bin';
+        const key = `foods/${Date.now()}-${crypto.randomBytes(6).toString('hex')}.${ext}`;
+        await r2.send(new PutObjectCommand({
+            Bucket: process.env.R2_BUCKET_NAME,
+            Key: key,
+            Body: req.file.buffer,
+            ContentType: req.file.mimetype,
+            ACL: 'public-read'
+        }));
+        const publicBase = process.env.R2_PUBLIC_BASE_URL?.replace(/\/$/, '') || `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${process.env.R2_BUCKET_NAME}`;
+        const url = `${publicBase}/${key}`;
+        res.json({ url, key });
+    } catch (error) {
+        console.error('Error uploading to R2:', error);
+        res.status(500).json({ error: 'Failed to upload file' });
     }
 });
 
