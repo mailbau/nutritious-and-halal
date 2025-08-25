@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+import { API_BASE } from '../../../lib/api'
 
 async function getArticle(id: string) {
     const res = await fetch(`${API_BASE}/api/articles/${id}`, { cache: 'no-store' })

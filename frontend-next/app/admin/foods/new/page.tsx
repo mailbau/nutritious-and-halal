@@ -8,12 +8,24 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
 export default function NewFoodPage() {
     const [formData, setFormData] = useState({
         name: '',
+        category: '',
         halal: true,
-        reason: ''
+        reason: '',
+        tips: '',
+        image: ''
     })
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState('')
     const router = useRouter()
+
+    const categories = [
+        { id: 'karbohidrat', name: 'Karbohidrat' },
+        { id: 'protein-hewani', name: 'Protein Hewani' },
+        { id: 'protein-nabati', name: 'Protein Nabati' },
+        { id: 'lemak', name: 'Lemak' },
+        { id: 'vitamin-mineral', name: 'Vitamin & Mineral' },
+        { id: 'bahan-tambahan-pangan', name: 'Bahan Tambahan Pangan' }
+    ]
 
     useEffect(() => {
         const token = localStorage.getItem('adminToken')
@@ -119,6 +131,26 @@ export default function NewFoodPage() {
                                 </div>
 
                                 <div>
+                                    <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
+                                        Kategori *
+                                    </label>
+                                    <select
+                                        id="category"
+                                        required
+                                        className="input-field"
+                                        value={formData.category}
+                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                    >
+                                        <option value="">Pilih Kategori</option>
+                                        {categories.map((category) => (
+                                            <option key={category.id} value={category.id}>
+                                                {category.name}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
                                         Status Halal *
                                     </label>
@@ -160,6 +192,36 @@ export default function NewFoodPage() {
                                         placeholder="Jelaskan alasan status halal makanan ini"
                                         value={formData.reason}
                                         onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="tips" className="block text-sm font-medium text-gray-700 mb-2">
+                                        Tips *
+                                    </label>
+                                    <textarea
+                                        id="tips"
+                                        required
+                                        rows={4}
+                                        className="input-field"
+                                        placeholder="Berikan tips untuk makanan ini"
+                                        value={formData.tips}
+                                        onChange={(e) => setFormData({ ...formData, tips: e.target.value })}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
+                                        Gambar Makanan *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="image"
+                                        required
+                                        className="input-field"
+                                        placeholder="Masukkan URL gambar makanan"
+                                        value={formData.image}
+                                        onChange={(e) => setFormData({ ...formData, image: e.target.value })}
                                     />
                                 </div>
                             </div>

@@ -141,6 +141,17 @@ app.get("/api/faqs", async (req, res) => {
   }
 });
 
+// Observations API (migrated to PostgreSQL)
+app.get("/api/observations", async (req, res) => {
+  try {
+    const result = await pool.query('SELECT id, question, yes_outcome, no_outcome FROM observations WHERE active = TRUE ORDER BY sort_order ASC, created_at DESC');
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Error fetching observations:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Use routers
 app.use("/api/articles", articlesRouter);
 app.use("/api/admin", adminRouter);

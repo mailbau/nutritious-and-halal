@@ -1,55 +1,70 @@
 "use client"
-import { useState } from 'react'
-
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+import { useState, useEffect } from 'react'
+import { API_BASE } from '../../lib/api'
 
 export default function IngredientsPage() {
     const [q, setQ] = useState('')
     const [result, setResult] = useState<any>(null)
     const [loading, setLoading] = useState(false)
+    const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+    const [foods, setFoods] = useState<any[]>([])
+    const [selectedFood, setSelectedFood] = useState<any>(null)
+    const [loadingFoods, setLoadingFoods] = useState(false)
+    const [observations, setObservations] = useState<any[]>([])
+    const [obsAnswers, setObsAnswers] = useState<Record<number, 'IYA' | 'TIDAK' | undefined>>({})
+
+    useEffect(() => {
+        async function fetchObservations() {
+            try {
+                const res = await fetch(`${API_BASE}/api/observations`, { next: { revalidate: 60 } as any })
+                if (res.ok) {
+                    const data = await res.json()
+                    setObservations(data)
+                }
+            } catch (e) {
+                // ignore
+            }
+        }
+        fetchObservations()
+    }, [])
 
     const categories = [
         {
-            title: 'Sumber Karbohidrat',
+            id: 'karbohidrat',
+            title: 'Karbohidrat',
             icon: '🌾',
             description: 'Nasi, roti, pasta, dan sumber karbohidrat lainnya'
         },
         {
-            title: 'Sumber Protein',
+            id: 'protein-hewani',
+            title: 'Protein Hewani',
             icon: '🥩',
-            description: 'Daging, ikan, telur, dan sumber protein lainnya'
+            description: 'Daging, ikan, telur, dan sumber protein hewani'
         },
         {
-            title: 'Sumber Vitamin',
+            id: 'protein-nabati',
+            title: 'Protein Nabati',
+            icon: '🫘',
+            description: 'Kacang-kacangan, tempe, tahu, dan sumber protein nabati'
+        },
+        {
+            id: 'lemak',
+            title: 'Lemak',
+            icon: '🥑',
+            description: 'Minyak, mentega, dan sumber lemak lainnya'
+        },
+        {
+            id: 'vitamin-mineral',
+            title: 'Vitamin & Mineral',
             icon: '🥕',
-            description: 'Sayuran, buah-buahan, dan sumber vitamin lainnya'
+            description: 'Sayuran, buah-buahan, dan sumber vitamin mineral'
         },
         {
-            title: 'Sumber Mineral',
-            icon: '🥛',
-            description: 'Susu, keju, dan sumber mineral lainnya'
-        },
-        {
+            id: 'bahan-tambahan-pangan',
             title: 'Bahan Tambahan Pangan',
             icon: '🧪',
             description: 'Pengawet, pewarna, dan bahan tambahan lainnya'
-        },
-        {
-            title: 'Bahan Siap Saji',
-            icon: '🍔',
-            description: 'Makanan kemasan dan produk siap konsumsi'
         }
-    ]
-
-    const questions = [
-        'Apakah boleh mengonsumsi makanan yang mengandung gelatin?',
-        'Apakah boleh mengonsumsi makanan yang mengandung MSG?',
-        'Apakah boleh mengonsumsi makanan yang mengandung emulsifier?',
-        'Apakah boleh mengonsumsi makanan yang mengandung ragi?',
-        'Is it permissible to consume food containing food coloring?',
-        'Is it permissible to consume food containing food flavoring?',
-        'Is it permissible to consume food containing food preservatives?',
-        'Is it permissible to consume food containing food thickeners?'
     ]
 
     async function onCheck() {
@@ -62,6 +77,177 @@ export default function IngredientsPage() {
         } finally {
             setLoading(false)
         }
+    }
+
+    async function loadFoodsByCategory(categoryId: string) {
+        setSelectedCategory(categoryId)
+        setLoadingFoods(true)
+        setSelectedFood(null)
+        try {
+            const res = await fetch(`${API_BASE}/api/foods?category=${categoryId}`)
+            if (res.ok) {
+                const data = await res.json()
+                setFoods(data)
+            } else {
+                setFoods([])
+            }
+        } catch (error) {
+            console.error('Error loading foods:', error)
+            setFoods([])
+        } finally {
+            setLoadingFoods(false)
+        }
+    }
+
+    function selectFood(food: any) {
+        setSelectedFood(food)
+    }
+
+    function goBack() {
+        setSelectedCategory(null)
+        setSelectedFood(null)
+        setFoods([])
+    }
+
+    function renderOutcomeBadge(outcome?: string) {
+        if (!outcome) return null
+        const map: any = {
+            HALAL: 'bg-green-100 text-green-800',
+            HARAM: 'bg-red-100 text-red-800',
+            SYUBHAT: 'bg-yellow-100 text-yellow-800'
+        }
+        return <span className={`ml-3 inline-flex px-2 py-1 rounded-full text-xs font-semibold ${map[outcome] || 'bg-gray-100 text-gray-700'}`}>{outcome}</span>
+    }
+
+    // If a food is selected, show the detail
+    if (selectedFood) {
+        return (
+            <div className="space-y-8">
+                {/* Header */}
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => setSelectedFood(null)}
+                        className="flex items-center gap-2 text-green-600 hover:text-green-700 font-medium"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Kembali ke Katalog
+                    </button>
+                </div>
+
+                {/* Food Detail */}
+                <div className="card p-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {selectedFood.image && (
+                            <div className="rounded-2xl overflow-hidden">
+                                <img
+                                    src={selectedFood.image}
+                                    alt={selectedFood.name}
+                                    className="w-full h-64 object-cover"
+                                />
+                            </div>
+                        )}
+                        <div className="space-y-6">
+                            <div>
+                                <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                                    {selectedFood.name}
+                                </h1>
+                                <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${selectedFood.halal
+                                        ? 'bg-green-100 text-green-800'
+                                        : 'bg-red-100 text-red-800'
+                                    }`}>
+                                    {selectedFood.halal ? 'HALAL' : 'TIDAK HALAL'}
+                                </span>
+                            </div>
+
+                            <div>
+                                <h3 className="text-lg font-semibold text-gray-900 mb-2">Penjelasan</h3>
+                                <p className="text-gray-700 leading-relaxed">
+                                    {selectedFood.reason || 'Tidak ada penjelasan tersedia.'}
+                                </p>
+                            </div>
+
+                            {selectedFood.tips && (
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Tips</h3>
+                                    <p className="text-gray-700 leading-relaxed">
+                                        {selectedFood.tips}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    // If a category is selected, show the catalogue
+    if (selectedCategory) {
+        const currentCategory = categories.find(cat => cat.id === selectedCategory)
+
+        return (
+            <div className="space-y-8">
+                {/* Header */}
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={goBack}
+                        className="flex items-center gap-2 text-green-600 hover:text-green-700 font-medium"
+                    >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Kembali
+                    </button>
+                    <h1 className="text-3xl font-bold text-gray-900">
+                        {currentCategory?.title}
+                    </h1>
+                </div>
+
+                {/* Food Catalogue */}
+                {loadingFoods ? (
+                    <div className="text-center py-12">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+                        <p className="mt-4 text-gray-600">Memuat katalog...</p>
+                    </div>
+                ) : foods.length > 0 ? (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        {foods.map((food) => (
+                            <button
+                                key={food.id}
+                                type="button"
+                                className="card p-4 text-center cursor-pointer hover:shadow-medium transition-all duration-200 text-left"
+                                onClick={() => selectFood(food)}
+                            >
+                                {food.image && (
+                                    <div className="w-full h-32 mb-4 rounded-lg overflow-hidden">
+                                        <img
+                                            src={food.image}
+                                            alt={food.name}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </div>
+                                )}
+                                <h3 className="font-semibold text-gray-900 text-sm line-clamp-2">
+                                    {food.name}
+                                </h3>
+                            </button>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-12">
+                        <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m6 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+                            </svg>
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">Belum ada data</h3>
+                        <p className="text-gray-500">Data makanan untuk kategori ini akan segera tersedia</p>
+                    </div>
+                )}
+            </div>
+        )
     }
 
     return (
@@ -125,7 +311,10 @@ export default function IngredientsPage() {
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-4">{category.title}</h3>
                             <p className="text-gray-600 leading-relaxed">{category.description}</p>
-                            <button className="mt-6 btn-primary">
+                            <button
+                                className="mt-6 btn-primary"
+                                onClick={() => loadFoodsByCategory(category.id)}
+                            >
                                 Periksa
                             </button>
                         </div>
@@ -138,24 +327,39 @@ export default function IngredientsPage() {
                 <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Observasi Makanan Halal</h2>
                 <div className="card p-8">
                     <div className="space-y-4">
-                        {questions.map((question, index) => (
-                            <div key={index} className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors duration-200 cursor-pointer group">
-                                <span className="text-gray-700 font-medium group-hover:text-gray-900 transition-colors">
-                                    {question}
-                                </span>
-                                <div className="flex items-center space-x-2">
-                                    <svg className="w-5 h-5 text-gray-400 group-hover:text-green-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
+                        {observations.map((obs: any) => {
+                            const answer = obsAnswers[obs.id]
+                            const outcome = answer === 'IYA' ? obs.yes_outcome : answer === 'TIDAK' ? obs.no_outcome : undefined
+                            return (
+                                <div key={obs.id} className="p-4 border border-gray-200 rounded-xl">
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div className="text-gray-800 font-medium">
+                                            {obs.question}
+                                            {renderOutcomeBadge(outcome)}
+                                        </div>
+                                        <div className="flex items-center gap-2 shrink-0">
+                                            <button
+                                                type="button"
+                                                onClick={() => setObsAnswers(prev => ({ ...prev, [obs.id]: 'IYA' }))}
+                                                className={`px-4 py-2 rounded-lg text-sm font-semibold border ${answer === 'IYA' ? 'bg-green-600 text-white border-green-600' : 'border-green-600 text-green-700 hover:bg-green-50'}`}
+                                            >
+                                                Iya
+                                            </button>
+                                            <button
+                                                type="button"
+                                                onClick={() => setObsAnswers(prev => ({ ...prev, [obs.id]: 'TIDAK' }))}
+                                                className={`px-4 py-2 rounded-lg text-sm font-semibold border ${answer === 'TIDAK' ? 'bg-red-600 text-white border-red-600' : 'border-red-600 text-red-700 hover:bg-red-50'}`}
+                                            >
+                                                Tidak
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    <div className="mt-8 text-center">
-                        <button className="btn-primary px-8 py-4 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                            Check Halal Certified Products from BPJPH
-                        </button>
+                            )
+                        })}
+                        {observations.length === 0 && (
+                            <div className="text-center text-gray-500">Belum ada pertanyaan observasi.</div>
+                        )}
                     </div>
                 </div>
             </section>

@@ -101,7 +101,7 @@ router.delete('/faqs/:id', authenticateAdmin, async (req, res) => {
 // Foods CRUD routes
 router.get('/foods', authenticateAdmin, async (req, res) => {
     try {
-        const result = await pool.query('SELECT id, name, halal, reason, created_at FROM foods ORDER BY created_at DESC');
+        const result = await pool.query('SELECT id, name, category, halal, reason, tips, image, created_at FROM foods ORDER BY created_at DESC');
         res.json(result.rows);
     } catch (error) {
         console.error('Error fetching foods:', error);
@@ -111,10 +111,10 @@ router.get('/foods', authenticateAdmin, async (req, res) => {
 
 router.post('/foods', authenticateAdmin, async (req, res) => {
     try {
-        const { name, halal, reason } = req.body;
+        const { name, category, halal, reason, tips, image } = req.body;
         const result = await pool.query(
-            'INSERT INTO foods (name, halal, reason) VALUES ($1, $2, $3) RETURNING *',
-            [name, halal, reason]
+            'INSERT INTO foods (name, category, halal, reason, tips, image) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+            [name, category, halal, reason, tips, image]
         );
         res.status(201).json(result.rows[0]);
     } catch (error) {
@@ -126,10 +126,10 @@ router.post('/foods', authenticateAdmin, async (req, res) => {
 router.put('/foods/:id', authenticateAdmin, async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, halal, reason } = req.body;
+        const { name, category, halal, reason, tips, image } = req.body;
         const result = await pool.query(
-            'UPDATE foods SET name = $1, halal = $2, reason = $3 WHERE id = $4 RETURNING *',
-            [name, halal, reason, id]
+            'UPDATE foods SET name = $1, category = $2, halal = $3, reason = $4, tips = $5, image = $6 WHERE id = $7 RETURNING *',
+            [name, category, halal, reason, tips, image, id]
         );
         if (result.rows.length === 0) {
             return res.status(404).json({ error: 'Food not found' });
@@ -151,6 +151,77 @@ router.delete('/foods/:id', authenticateAdmin, async (req, res) => {
         res.json({ message: 'Food deleted successfully' });
     } catch (error) {
         console.error('Error deleting food:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Observations CRUD routes
+router.get('/observations', authenticateAdmin, async (req, res) => {
+    try {
+        const result = await pool.query('SELECT id, question, yes_outcome, no_outcome, sort_order, active, created_at FROM observations ORDER BY sort_order ASC, created_at DESC');
+        res.json(result.rows);
+    } catch (error) {
+        console.error('Error fetching observations:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.post('/observations', authenticateAdmin, async (req, res) => {
+    try {
+        const { question, yes_outcome, no_outcome, sort_order = 0, active = true } = req.body;
+        const result = await pool.query(
+            'INSERT INTO observations (question, yes_outcome, no_outcome, sort_order, active) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+            [question, yes_outcome, no_outcome, sort_order, active]
+        );
+        res.status(201).json(result.rows[0]);
+    } catch (error) {
+        console.error('Error creating observation:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.put('/observations/:id', authenticateAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { question, yes_outcome, no_outcome, sort_order = 0, active = true } = req.body;
+        const result = await pool.query(
+            'UPDATE observations SET question = $1, yes_outcome = $2, no_outcome = $3, sort_order = $4, active = $5 WHERE id = $6 RETURNING *',
+            [question, yes_outcome, no_outcome, sort_order, active, id]
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Observation not found' });
+        }
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error('Error updating observation:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.delete('/observations/:id', authenticateAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await pool.query('DELETE FROM observations WHERE id = $1 RETURNING *', [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Observation not found' });
+        }
+        res.json({ message: 'Observation deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting observation:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+router.get('/observations/:id', authenticateAdmin, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const result = await pool.query('SELECT id, question, yes_outcome, no_outcome, sort_order, active, created_at FROM observations WHERE id = $1', [id]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Observation not found' });
+        }
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error('Error fetching observation:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

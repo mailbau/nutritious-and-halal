@@ -180,15 +180,6 @@ export default function AdminDashboardPage() {
                     <div className="card p-6">
                         <h2 className="text-xl font-bold text-gray-900 mb-6">Aksi Cepat</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <Link href="/admin/articles/new" className="card p-4 text-center hover:shadow-medium transition-all duration-200">
-                                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                                    </svg>
-                                </div>
-                                <h3 className="font-semibold text-gray-900">Tambah Artikel</h3>
-                            </Link>
-
                             <Link href="/admin/articles" className="card p-4 text-center hover:shadow-medium transition-all duration-200">
                                 <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
                                     <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -214,6 +205,15 @@ export default function AdminDashboardPage() {
                                     </svg>
                                 </div>
                                 <h3 className="font-semibold text-gray-900">Kelola Makanan</h3>
+                            </Link>
+
+                            <Link href="/admin/observations" className="card p-4 text-center hover:shadow-medium transition-all duration-200">
+                                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                    </svg>
+                                </div>
+                                <h3 className="font-semibold text-gray-900">Kelola Observasi</h3>
                             </Link>
                         </div>
                     </div>

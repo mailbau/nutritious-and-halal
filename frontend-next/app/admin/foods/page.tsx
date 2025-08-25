@@ -8,8 +8,11 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
 interface Food {
     id: number
     name: string
+    category: string
     halal: boolean
     reason: string
+    tips: string
+    image: string
     created_at: string
 }
 
@@ -144,16 +147,22 @@ export default function AdminFoodsPage() {
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Nama Makanan
+                                            Bahan Makanan
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Status Halal
+                                            Kategori
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Alasan
+                                            Status
                                         </th>
                                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Tanggal Dibuat
+                                            Penjelasan
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Tips
+                                        </th>
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                            Gambar
                                         </th>
                                         <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                                             Aksi
@@ -168,21 +177,45 @@ export default function AdminFoodsPage() {
                                                     {food.name}
                                                 </div>
                                             </td>
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm text-gray-500">
+                                                    {food.category || '-'}
+                                                </div>
+                                            </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${food.halal
-                                                        ? 'bg-green-100 text-green-800'
-                                                        : 'bg-red-100 text-red-800'
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-red-100 text-red-800'
                                                     }`}>
                                                     {food.halal ? 'HALAL' : 'TIDAK HALAL'}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4">
                                                 <div className="text-sm text-gray-500 line-clamp-2">
-                                                    {food.reason}
+                                                    {food.reason || '-'}
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {new Date(food.created_at).toLocaleDateString('id-ID')}
+                                            <td className="px-6 py-4">
+                                                <div className="text-sm text-gray-500 line-clamp-2">
+                                                    {food.tips || '-'}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                {food.image ? (
+                                                    <div className="w-12 h-12 rounded-lg overflow-hidden">
+                                                        <img
+                                                            src={food.image}
+                                                            alt={food.name}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    </div>
+                                                ) : (
+                                                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                                        <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                    </div>
+                                                )}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                                 <div className="flex items-center justify-end gap-2">
