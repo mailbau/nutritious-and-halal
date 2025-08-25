@@ -437,6 +437,29 @@ export default function IngredientsPage() {
                             </button>
                         </div>
                     )}
+
+                    {/* Cek Sertifikat Halal Button */}
+                    <div className="mt-8 pt-6 border-t border-gray-200">
+                        <div className="text-center">
+                            <p className="text-sm text-gray-600 mb-4">
+                                Ingin memeriksa sertifikat halal resmi dari BPJPH?
+                            </p>
+                            <a
+                                href="https://bpjph.halal.go.id/detail/cek-status-sertifikasi-halal-produk-di-halal-go-id-ini-caranya"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors duration-200"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                                Cek Produk Sertifikat Halal
+                            </a>
+                            <p className="text-xs text-gray-500 mt-2">
+                                Link eksternal ke website resmi BPJPH
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </section>
 
