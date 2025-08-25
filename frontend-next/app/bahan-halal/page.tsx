@@ -14,6 +14,8 @@ export default function IngredientsPage() {
     const [obsAnswers, setObsAnswers] = useState<Record<number, 'IYA' | 'TIDAK' | undefined>>({})
     const [suggestions, setSuggestions] = useState<any[]>([])
     const [showSuggestions, setShowSuggestions] = useState(false)
+    const [obsPage, setObsPage] = useState(1)
+    const obsPerPage = 5
 
     useEffect(() => {
         async function fetchObservations() {
@@ -378,7 +380,7 @@ export default function IngredientsPage() {
                 <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Observasi Makanan Halal</h2>
                 <div className="card p-8">
                     <div className="space-y-4">
-                        {observations.map((obs: any) => {
+                        {observations.slice((obsPage - 1) * obsPerPage, obsPage * obsPerPage).map((obs: any) => {
                             const answer = obsAnswers[obs.id]
                             const outcome = answer === 'IYA' ? obs.yes_outcome : answer === 'TIDAK' ? obs.no_outcome : undefined
                             return (
@@ -412,6 +414,29 @@ export default function IngredientsPage() {
                             <div className="text-center text-gray-500">Belum ada pertanyaan observasi.</div>
                         )}
                     </div>
+
+                    {/* Pagination */}
+                    {observations.length > obsPerPage && (
+                        <div className="flex items-center justify-center gap-2 mt-6 pt-6 border-t border-gray-200">
+                            <button
+                                onClick={() => setObsPage(prev => Math.max(1, prev - 1))}
+                                disabled={obsPage === 1}
+                                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Sebelumnya
+                            </button>
+                            <span className="px-3 py-2 text-sm text-gray-700">
+                                Halaman {obsPage} dari {Math.ceil(observations.length / obsPerPage)}
+                            </span>
+                            <button
+                                onClick={() => setObsPage(prev => Math.min(Math.ceil(observations.length / obsPerPage), prev + 1))}
+                                disabled={obsPage === Math.ceil(observations.length / obsPerPage)}
+                                className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Selanjutnya
+                            </button>
+                        </div>
+                    )}
                 </div>
             </section>
 

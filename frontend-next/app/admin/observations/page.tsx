@@ -21,6 +21,8 @@ export default function AdminObservationsPage() {
     const [items, setItems] = useState<Observation[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 5
     const router = useRouter()
 
     useEffect(() => {
@@ -133,7 +135,7 @@ export default function AdminObservationsPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {items.map((it) => (
+                                    {items.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage).map((it) => (
                                         <tr key={it.id} className="hover:bg-gray-50">
                                             <td className="px-6 py-4 text-sm text-gray-900">{it.question}</td>
                                             <td className="px-6 py-4">{outcomeBadge(it.yes_outcome)}</td>
@@ -153,6 +155,34 @@ export default function AdminObservationsPage() {
                                 </tbody>
                             </table>
                         </div>
+
+                        {/* Pagination */}
+                        {items.length > itemsPerPage && (
+                            <div className="flex items-center justify-between px-6 py-4 bg-gray-50 border-t border-gray-200">
+                                <div className="text-sm text-gray-700">
+                                    Menampilkan {((currentPage - 1) * itemsPerPage) + 1} sampai {Math.min(currentPage * itemsPerPage, items.length)} dari {items.length} observasi
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                        disabled={currentPage === 1}
+                                        className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Sebelumnya
+                                    </button>
+                                    <span className="px-3 py-2 text-sm text-gray-700">
+                                        Halaman {currentPage} dari {Math.ceil(items.length / itemsPerPage)}
+                                    </span>
+                                    <button
+                                        onClick={() => setCurrentPage(prev => Math.min(Math.ceil(items.length / itemsPerPage), prev + 1))}
+                                        disabled={currentPage === Math.ceil(items.length / itemsPerPage)}
+                                        className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Selanjutnya
+                                    </button>
+                                </div>
+                            </div>
+                        )}
 
                         {items.length === 0 && (
                             <div className="text-center py-12">
